@@ -1,6 +1,6 @@
 /*
- * Sonar Crowd Plugin
- * Copyright (C) 2009 ${owner}
+ * Sonar Crowd Plugin - Provide Atlassian Crowd integration for Sonarqube
+ * Copyright (C) 2009 Evgeny Mandrikov
  * dev@sonar.codehaus.org
  *
  * This program is free software; you can redistribute it and/or
@@ -13,31 +13,25 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.plugins.crowd;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import org.sonar.api.Extension;
-import org.sonar.api.SonarPlugin;
+import org.sonar.api.*;
 
 import java.util.List;
 
 /**
  * @author Evgeny Mandrikov
  */
-public class CrowdPlugin extends SonarPlugin {
-
+public class CrowdPlugin implements Plugin {
   @Override
-  public List<Class<? extends Extension>> getExtensions() {
-    Builder<Class<? extends Extension>> builder = ImmutableList.builder();
-
-    builder.add(CrowdRealm.class);
-    builder.add(CrowdConfiguration.class);
-
-    return builder.build();
+  public void define(Context context) {
+    context.addExtension(CrowdRealm.class);
+    context.addExtension(CrowdConfiguration.class);
   }
 }

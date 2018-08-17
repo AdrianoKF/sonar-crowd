@@ -1,6 +1,6 @@
 /*
- * Sonar Crowd Plugin
- * Copyright (C) 2009 ${owner}
+ * Sonar Crowd Plugin - Provide Atlassian Crowd integration for Sonarqube
+ * Copyright (C) 2009 Evgeny Mandrikov
  * dev@sonar.codehaus.org
  *
  * This program is free software; you can redistribute it and/or
@@ -13,20 +13,22 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonar.plugins.crowd;
 
-import org.sonar.api.ServerExtension;
+import org.sonar.api.ExtensionPoint;
 import org.sonar.api.config.Settings;
+import org.sonar.api.server.ServerSide;
 
 /**
  * @author Evgeny Mandrikov
  */
-public class CrowdConfiguration implements ServerExtension {
-
+@ExtensionPoint
+@ServerSide
+public class CrowdConfiguration {
   static final String KEY_CROWD_URL = "crowd.url";
   static final String KEY_CROWD_APP_NAME = "crowd.application";
   static final String KEY_CROWD_APP_PASSWORD = "crowd.password";
@@ -36,7 +38,7 @@ public class CrowdConfiguration implements ServerExtension {
   /**
    * Creates new instance of CrowdConfiguration.
    *
-   * @param configuration configuration
+   * @param settings settings
    */
   public CrowdConfiguration(Settings settings) {
     this.settings = settings;
