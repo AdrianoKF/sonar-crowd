@@ -1,7 +1,7 @@
 /*
- * Sonar Crowd Plugin - Provide Atlassian Crowd integration for Sonarqube
+ * Sonar Crowd Plugin
  * Copyright (C) 2009 Evgeny Mandrikov
- * dev@sonar.codehaus.org
+ * sonarqube@googlegroups.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -13,29 +13,24 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 package org.sonar.plugins.crowd;
 
-import com.atlassian.crowd.exception.ApplicationPermissionException;
-import com.atlassian.crowd.exception.InvalidAuthenticationException;
-import com.atlassian.crowd.exception.OperationFailedException;
-import com.atlassian.crowd.exception.UserNotFoundException;
+import com.atlassian.crowd.exception.*;
 import com.atlassian.crowd.model.user.User;
 import com.atlassian.crowd.service.client.CrowdClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.security.ExternalUsersProvider;
 import org.sonar.api.security.UserDetails;
-import org.sonar.api.utils.SonarException;
 
 /**
  * External users provider implementation for Atlassian Crowd. 
  */
 public class CrowdUsersProvider extends ExternalUsersProvider {
-
   private static final Logger LOG = LoggerFactory.getLogger(CrowdUsersProvider.class);
 
   private final CrowdClient crowdClient;
@@ -45,7 +40,8 @@ public class CrowdUsersProvider extends ExternalUsersProvider {
   }
 
   @Override
-  public UserDetails doGetUserDetails(String username) {
+  public UserDetails doGetUserDetails(Context context) {
+    final String username = context.getUsername();
     LOG.debug("Looking up user details for user {}", username);
 
     try {
@@ -61,17 +57,16 @@ public class CrowdUsersProvider extends ExternalUsersProvider {
     } catch (UserNotFoundException e) {
       return null; // API contract for ExternalUsersProvider
     } catch (OperationFailedException e) {
-      throw new SonarException("Unable to retrieve user details for user" + username
+      throw new IllegalStateException("Unable to retrieve user details for user" + username
         + " from crowd.", e);
     } catch (ApplicationPermissionException e) {
-      throw new SonarException(
+      throw new IllegalStateException(
         "Unable to retrieve user details for user" + username
           + " from crowd. The application is not permitted to perform the "
           + "requested operation on the crowd server.", e);
     } catch (InvalidAuthenticationException e) {
-      throw new SonarException("Unable to retrieve user details for user" + username
+      throw new IllegalArgumentException("Unable to retrieve user details for user" + username
         + " from crowd. The application name and password are incorrect.", e);
     }
   }
-
 }

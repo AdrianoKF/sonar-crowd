@@ -1,7 +1,7 @@
 /*
  * Sonar Crowd Plugin
- * Copyright (C) 2009 ${owner}
- * dev@sonar.codehaus.org
+ * Copyright (C) 2009 Evgeny Mandrikov
+ * sonarqube@googlegroups.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,46 +20,50 @@
 package org.sonar.plugins.crowd;
 
 import org.junit.Test;
-import org.sonar.api.config.Settings;
+import org.sonar.api.config.Configuration;
+import org.sonar.api.config.internal.ConfigurationBridge;
+import org.sonar.api.config.internal.MapSettings;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class CrowdConfigurationTest {
-
   @Test(expected = IllegalArgumentException.class)
   public void crowdUrlMissing() {
-    Settings settings = new Settings();
-    new CrowdConfiguration(settings).getCrowdUrl();
+    final Configuration config = new ConfigurationBridge(new MapSettings());
+    new CrowdConfiguration(config).getCrowdUrl();
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void applicationPasswordMissing() {
-    Settings settings = new Settings();
+    final MapSettings settings = new MapSettings();
+    final Configuration config = new ConfigurationBridge(settings);
     settings.setProperty(CrowdConfiguration.KEY_CROWD_URL, "http://localhost:8095");
-    new CrowdConfiguration(settings).getCrowdApplicationPassword();
+    new CrowdConfiguration(config).getCrowdApplicationPassword();
   }
 
   @Test
   public void usesFallbackForUnsetApplicationName() {
-    Settings settings = new Settings();
+    final MapSettings settings = new MapSettings();
     settings.setProperty(CrowdConfiguration.KEY_CROWD_URL, "http://localhost:8095");
     settings.setProperty(CrowdConfiguration.KEY_CROWD_APP_PASSWORD, "secret");
-    CrowdConfiguration crowdConfiguration = new CrowdConfiguration(settings);
+    final Configuration config = new ConfigurationBridge(settings);
+    CrowdConfiguration crowdConfiguration = new CrowdConfiguration(config);
     assertThat(crowdConfiguration.getCrowdApplicationName(), is(CrowdConfiguration.FALLBACK_NAME));
   }
 
   @Test
   public void createsClientProperties() {
-    Settings settings = new Settings();
+    final MapSettings settings = new MapSettings();
     settings.setProperty(CrowdConfiguration.KEY_CROWD_URL, "http://localhost:8095");
     settings.setProperty(CrowdConfiguration.KEY_CROWD_APP_NAME, "SonarQube");
     settings.setProperty(CrowdConfiguration.KEY_CROWD_APP_PASSWORD, "secret");
-    CrowdConfiguration crowdConfiguration = new CrowdConfiguration(settings);
+
+    final Configuration config = new ConfigurationBridge(settings);
+    CrowdConfiguration crowdConfiguration = new CrowdConfiguration(config);
 
     assertThat(crowdConfiguration.getCrowdUrl(), is("http://localhost:8095"));
     assertThat(crowdConfiguration.getCrowdApplicationName(), is("SonarQube"));
     assertThat(crowdConfiguration.getCrowdApplicationPassword(), is("secret"));
   }
-
 }

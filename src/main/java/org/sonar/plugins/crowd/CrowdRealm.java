@@ -1,7 +1,7 @@
 /*
- * Sonar Crowd Plugin - Provide Atlassian Crowd integration for Sonarqube
+ * Sonar Crowd Plugin
  * Copyright (C) 2009 Evgeny Mandrikov
- * dev@sonar.codehaus.org
+ * sonarqube@googlegroups.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -13,26 +13,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 package org.sonar.plugins.crowd;
 
-import com.atlassian.crowd.exception.ApplicationPermissionException;
-import com.atlassian.crowd.exception.InvalidAuthenticationException;
-import com.atlassian.crowd.exception.OperationFailedException;
+import com.atlassian.crowd.exception.*;
 import com.atlassian.crowd.integration.rest.service.factory.RestCrowdClientFactory;
-import com.atlassian.crowd.service.client.ClientProperties;
-import com.atlassian.crowd.service.client.ClientPropertiesImpl;
-import com.atlassian.crowd.service.client.CrowdClient;
+import com.atlassian.crowd.service.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.security.ExternalGroupsProvider;
-import org.sonar.api.security.ExternalUsersProvider;
-import org.sonar.api.security.LoginPasswordAuthenticator;
-import org.sonar.api.security.SecurityRealm;
-import org.sonar.api.utils.SonarException;
+import org.sonar.api.security.*;
 
 import java.util.Properties;
 
@@ -40,7 +32,6 @@ import java.util.Properties;
  * Sonar security realm for Atlassian Crowd.
  */
 public class CrowdRealm extends SecurityRealm {
-
   private static final Logger LOG = LoggerFactory.getLogger(CrowdRealm.class);
 
   private final CrowdConfiguration crowdConfiguration;
@@ -96,17 +87,17 @@ public class CrowdRealm extends SecurityRealm {
       crowdClient.testConnection();
       LOG.info("Crowd configuration is valid, connection test successful.");
     } catch (OperationFailedException e) {
-      throw new SonarException("Unable to test connection to crowd", e);
+      throw new IllegalStateException("Unable to test connection to crowd", e);
     } catch (InvalidAuthenticationException e) {
-      throw new SonarException("Application name and password are incorrect", e);
+      throw new IllegalArgumentException("Application name and password are incorrect", e);
     } catch (ApplicationPermissionException e) {
-      throw new SonarException("The application is not permitted to perform the requested "
+      throw new IllegalStateException("The application is not permitted to perform the requested "
         + "operation on the crowd server", e);
     }
   }
 
   @Override
-  public LoginPasswordAuthenticator getLoginPasswordAuthenticator() {
+  public Authenticator doGetAuthenticator() {
     return authenticator;
   }
 
@@ -119,5 +110,4 @@ public class CrowdRealm extends SecurityRealm {
   public ExternalUsersProvider getUsersProvider() {
     return usersProvider;
   }
-
 }

@@ -1,7 +1,7 @@
 /*
  * Sonar Crowd Plugin
- * Copyright (C) 2009 ${owner}
- * dev@sonar.codehaus.org
+ * Copyright (C) 2009 Evgeny Mandrikov
+ * sonarqube@googlegroups.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,15 +25,14 @@ import com.atlassian.crowd.model.user.User;
 import com.atlassian.crowd.service.client.CrowdClient;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CrowdAuthenticatorTest {
-
   @Test
   public void authenticatorReturnsTrueForSuccessfulLogin() throws Exception {
     CrowdClient client = mock(CrowdClient.class);

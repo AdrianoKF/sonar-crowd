@@ -1,7 +1,7 @@
 /*
- * Sonar Crowd Plugin - Provide Atlassian Crowd integration for Sonarqube
+ * Sonar Crowd Plugin
  * Copyright (C) 2009 Evgeny Mandrikov
- * dev@sonar.codehaus.org
+ * sonarqube@googlegroups.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -13,14 +13,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 package org.sonar.plugins.crowd;
 
 import org.sonar.api.ExtensionPoint;
-import org.sonar.api.config.Settings;
+import org.sonar.api.config.Configuration;
 import org.sonar.api.server.ServerSide;
 
 /**
@@ -33,31 +33,24 @@ public class CrowdConfiguration {
   static final String KEY_CROWD_APP_NAME = "crowd.application";
   static final String KEY_CROWD_APP_PASSWORD = "crowd.password";
   static final String FALLBACK_NAME = "sonar";
-  private final Settings settings;
+  private final Configuration configuration;
 
   /**
    * Creates new instance of CrowdConfiguration.
    *
-   * @param settings settings
+   * @param configuration configuration
    */
-  public CrowdConfiguration(Settings settings) {
-    this.settings = settings;
+  public CrowdConfiguration(Configuration configuration) {
+    this.configuration = configuration;
   }
 
-  private String get(String key, Settings settings, String fallback) {
-    String value = settings.getString(key);
-    if (value == null) {
-      return fallback;
-    }
-    return value;
+  private String get(String key, String fallback) {
+    return configuration.get(key).orElse(fallback);
   }
 
-  private String getAndValidate(String key, Settings settings) {
-    String value = settings.getString(key);
-    if (value == null) {
-      throw new IllegalArgumentException(key + " is not set");
-    }
-    return value;
+  private String getAndValidate(String key) {
+    return configuration.get(key)
+            .orElseThrow(() -> new IllegalArgumentException(key + " is not set"));
   }
 
   /**
@@ -65,7 +58,7 @@ public class CrowdConfiguration {
    * Uses the settings key {@value #KEY_CROWD_APP_NAME}
    */
   public String getCrowdApplicationName() {
-    return get(KEY_CROWD_APP_NAME, settings, FALLBACK_NAME);
+    return get(KEY_CROWD_APP_NAME, FALLBACK_NAME);
   }
 
   /**
@@ -73,14 +66,14 @@ public class CrowdConfiguration {
    * Uses the settings key {@value #KEY_CROWD_APP_PASSWORD}
    */
   public String getCrowdApplicationPassword() {
-    return getAndValidate(KEY_CROWD_APP_PASSWORD, settings);
+    return getAndValidate(KEY_CROWD_APP_PASSWORD);
   }
 
   /**
-   * The base URL of the crowd server, e.g. {@linkplain http://127.0.0.1:8095/crowd}.<br />
+   * The base URL of the crowd server, e.g. {@code http://127.0.0.1:8095/crowd}.<br />
    * Uses the settings key {@value #KEY_CROWD_URL}
    */
   public String getCrowdUrl() {
-    return getAndValidate(KEY_CROWD_URL, settings);
+    return getAndValidate(KEY_CROWD_URL);
   }
 }

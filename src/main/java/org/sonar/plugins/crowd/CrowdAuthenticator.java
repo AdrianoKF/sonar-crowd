@@ -1,7 +1,7 @@
 /*
- * Sonar Crowd Plugin :: Provide Atlassian Crowd integration for Sonarqube
+ * Sonar Crowd Plugin
  * Copyright (C) 2009 Evgeny Mandrikov
- * dev@sonar.codehaus.org
+ * sonarqube@googlegroups.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 package org.sonar.plugins.crowd;
 
@@ -23,13 +23,12 @@ import com.atlassian.crowd.exception.*;
 import com.atlassian.crowd.service.client.CrowdClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.security.LoginPasswordAuthenticator;
+import org.sonar.api.security.Authenticator;
 
 /**
  * @author Evgeny Mandrikov
  */
-public class CrowdAuthenticator implements LoginPasswordAuthenticator {
-
+public class CrowdAuthenticator extends Authenticator {
   private static final Logger LOG = LoggerFactory.getLogger(CrowdAuthenticator.class);
 
   private final CrowdClient client;
@@ -38,12 +37,6 @@ public class CrowdAuthenticator implements LoginPasswordAuthenticator {
     this.client = client;
   }
 
-  @Override
-  public void init() {
-    // noop
-  }
-
-  @Override
   public boolean authenticate(String login, String password) {
     try {
       client.authenticateUser(login, password);
@@ -68,5 +61,10 @@ public class CrowdAuthenticator implements LoginPasswordAuthenticator {
       LOG.error("Unable to authenticate user " + login, e);
       return false;
     }
+  }
+
+  @Override
+  public boolean doAuthenticate(Context context) {
+    return authenticate(context.getUsername(), context.getPassword());
   }
 }
